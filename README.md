@@ -10,7 +10,8 @@ Docker for this modele : https://github.com/vojteskas/Differential-Detection/tre
 
 ## Requirements
 
-docker 
+ - Docker
+ - FFConcat3_MHFA_finetune_7.pt model avaiable here :  https://drive.google.com/file/d/1FM-WowOpWLpgTFIzPFjpu_6amcMhctp0/view?usp=drive_link
 
 ## Usage
 
