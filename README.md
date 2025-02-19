@@ -1,8 +1,11 @@
 # Informed methods for deepfake speech detection
 
-**Author:** Vojtěch Staněk ([vojteskas](https://github.com/vojteskas)), xstane45@vutbr.cz ([Elluan](https://github.com/Elluan))
+**Author:**
+ Vojtěch Staněk ([vojteskas](https://github.com/vojteskas)), xstane45@vutbr.cz, 
+ Thel9 ([Elluan](https://github.com/Elluan))
 
-**Abstract:**Docker for this modele : https://github.com/vojteskas/Differential-Detection/tree/master
+**Abstract:**
+Docker for this modele : https://github.com/vojteskas/Differential-Detection/tree/master
 
 
 ## Requirements
