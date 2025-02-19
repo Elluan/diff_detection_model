@@ -15,7 +15,7 @@ Docker for this modele : https://github.com/vojteskas/Differential-Detection/tre
 
 ## Usage
 
-First you need to put the FFConcat3 model int the folder.
+First you need to put the FFConcat3 model into the folder.
 
 Create the image 
 ```
