@@ -4,7 +4,7 @@
  Vojtěch Staněk ([vojteskas](https://github.com/vojteskas)), xstane45@vutbr.cz, 
  Thel9 ([Elluan](https://github.com/Elluan))
 
-**Abstract:**
+**Content:**
 Docker for this modele : https://github.com/vojteskas/Differential-Detection/tree/master
 
 
