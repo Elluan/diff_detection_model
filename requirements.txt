@@ -1,0 +1,7 @@
+tensorboard
+pandas
+matplotlib
+scikit-learn
+tqdm
+audiomentations
+safe-gpu
