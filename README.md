@@ -24,7 +24,7 @@ docker build -t model .
 
 Run the container 
 ```
-docker run -p [port in your server]:[port in your container] model
+docker run -p [port in your server]:8000 model
 example : docker run -p 8000:8000 model
 ```
 
