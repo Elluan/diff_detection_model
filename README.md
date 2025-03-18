@@ -24,9 +24,10 @@ docker build -t model .
 
 Run the container 
 ```
-docker run -p 8000:8000 model
+docker run -p [port in your server]:[port in your container] model
+example : docker run -p 8000:8000 model
 ```
 
-Making POST request with 2 audio : real as the key real and suspected as the key fake to http://localhost:8000/diff-model/ will return the result of the Deepfake detection 
+Making POST request with 2 audio : real as the key real and suspected as the key fake to http://localhost:[port in your server]/diff-model/ (in ou case : http://localhost:8000/diff-model/ ) will return the result of the Deepfake detection 
 
 
