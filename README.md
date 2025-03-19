@@ -15,9 +15,9 @@ Docker for this modele : https://github.com/vojteskas/Differential-Detection/tre
 
 ## Usage
 
-First, you need to place the FFConcat3 model into the main diff-detection folder.
+First, you need to place the FFConcat3 model into the main diff_detection_model folder.
 
-The following commands should be executed in the main diff-detection folder.
+The following commands should be executed in the main diff_detection_model folder.
 
 Create the image 
 ```
