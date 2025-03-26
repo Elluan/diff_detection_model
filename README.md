@@ -27,9 +27,12 @@ docker build -t model .
 Run the container 
 ```
 docker run -p [port in your server]:8000 model
-example : docker run -p 8000:8000 model
+example : docker run -p 8888:8000 model
 ```
 
-Making POST request with 2 audio : real as the key real and suspected as the key fake to http://localhost:[port in your server]/diff-model/ (in ou case : http://localhost:8000/diff-model/ ) will return the result of the Deepfake detection 
+Making POST request with 2 audio : real as the key real and suspected as the key fake to http://localhost:[port in your server]/diff-model/ (in ou case : http://localhost:8888/diff-model/ ) will return the result of the Deepfake detection 
 
-
+Run the container for NABOSO app
+```
+docker run -p 8888:8000 model
+```
