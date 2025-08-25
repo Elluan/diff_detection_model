@@ -1,10 +1,18 @@
-from load_model_for_interactive import load_model_for_interactive
 from torchaudio import load
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
 from pathlib import Path
 import shutil
 import logging
+from celery import shared_task
+from minio import Minio
+import json
+import io
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from load_model_for_interactive import load_model_for_interactive
 
 # Use Uvicorn's logger
 logger = logging.getLogger("uvicorn.error")
@@ -13,10 +21,15 @@ model = load_model_for_interactive()
 logger.info(f"Model loaded: {model}")
 
 
-app = FastAPI()
+minio_client = Minio(
+    "minio:9000",
+    access_key="1GuTxVoX2I5R9qwxC8Aq",
+    secret_key="00eXWYBYKkmdkYQ4UnwnSyMZlzTDFvScCvtlSQ8Z",
+    secure=False
+)
 
-@app.post("/diff-model/")
-async def diff_model(real: UploadFile = File(...), fake: UploadFile = File(...)):
+@shared_task()
+def get_dual_input_prediction(self, bucket_name, folder,real: UploadFile = File(...), fake: UploadFile = File(...)):
     try:
         base_path = Path("audio")  # changed to relative path for Docker safety
         base_path.mkdir(parents=True, exist_ok=True)
@@ -43,6 +56,21 @@ async def diff_model(real: UploadFile = File(...), fake: UploadFile = File(...))
         except Exception as model_error:
             logger.error(f"Model inference failed with error: {model_error}")
             result = None
+
+        result = {
+            "score" : result
+        }
+
+        result_json = json.dumps(result)
+        data_bytes = result_json.encode('utf-8')
+
+        minio_client.put_object(
+            bucket_name,
+            f"{folder}/diff_input_result.json",
+            data=io.BytesIO(data_bytes),
+            length=len(data_bytes),
+            content_type="application/json"
+        )
             
         # result = 0.5
         logger.info(f"Model inference result: {result}")

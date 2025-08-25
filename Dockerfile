@@ -1,8 +1,8 @@
 FROM python:3.10
 
-WORKDIR /model
+WORKDIR /app
 
-COPY . /model
+COPY . /app
 
 RUN pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
 RUN pip3 install -r requirements.txt
@@ -12,4 +12,4 @@ RUN pip install python-multipart
 
 EXPOSE 8000
 
-CMD ["uvicorn", "diff_detection:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD [ "celery", "-A", "dual_input", "worker", "--loglevel=debug", "-n", "worker_dual", "-Q", "dual_input"]
