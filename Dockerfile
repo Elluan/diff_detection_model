@@ -12,4 +12,4 @@ RUN pip install python-multipart
 
 EXPOSE 8000
 
-CMD [ "celery", "-A", "dual_input", "worker", "--loglevel=debug", "-n", "worker_dual", "-Q", "dual_input"]
+CMD [ "celery", "-A", "dual_input", "worker", "--loglevel=debug", "-n", "worker_dual", "-Q", "dual_input", "-P", "solo"]
