@@ -14,8 +14,9 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from load_model_for_interactive import load_model_for_interactive
 
-# Use Uvicorn's logger
-logger = logging.getLogger("uvicorn.error")
+import logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 model = load_model_for_interactive()
 logger.info(f"Model loaded: {model}")
@@ -28,26 +29,31 @@ minio_client = Minio(
     secure=False
 )
 
+def get_audio_files(bucket_name, case_name, folder):
+    objects = minio_client.list_objects(bucket_name, prefix=f"{case_name}/{folder}/", recursive=True)
+    files = []
+    for obj in objects:
+        if obj.object_name.endswith(".mp3"):
+            # Načti soubor přímo do paměti
+            response = minio_client.get_object(bucket_name, obj.object_name)
+            file_bytes = io.BytesIO(response.read())
+            files.append((obj.object_name, file_bytes))
+    return files
+
 @shared_task()
-def get_dual_input_prediction(self, bucket_name, folder,real: UploadFile = File(...), fake: UploadFile = File(...)):
+def get_dual_input_prediction(bucket_name, case_name):
     try:
-        base_path = Path("audio")  # changed to relative path for Docker safety
-        base_path.mkdir(parents=True, exist_ok=True)
+        logger.info("Starting dual input prediction")
+        questioned_files = get_audio_files(bucket_name, case_name, "questioned")
+        ref_files = get_audio_files(bucket_name, case_name, "ref")
 
-        pathReal = base_path / real.filename
-        pathFake = base_path / fake.filename
+        _, questioned_bytes = questioned_files[0]
+        _, ref_bytes = ref_files[0]
 
-        with open(pathReal, "wb") as f:
-            shutil.copyfileobj(real.file, f)
-        with open(pathFake, "wb") as f:
-            shutil.copyfileobj(fake.file, f)
+        wf1, sr1 = load(questioned_bytes)
+        wf2, sr2 = load(ref_bytes)
 
-        logger.info(f"Saved files to {pathReal} and {pathFake}")
-
-        wf1, sr1 = load(pathReal)
-        wf2, sr2 = load(pathFake)
-
-        logger.info("Audio files loaded successfully")
+        logger.info(f"Audio files loaded successfully {questioned_files[0]} and {ref_files[0]}")
 
         try:
             logger.info(f"Attempting model inference with inputs: wf1={wf1.shape}, wf2={wf2.shape}")
@@ -64,18 +70,16 @@ def get_dual_input_prediction(self, bucket_name, folder,real: UploadFile = File(
         result_json = json.dumps(result)
         data_bytes = result_json.encode('utf-8')
 
+        logger.info(f"Score is {result}")
+
         minio_client.put_object(
             bucket_name,
-            f"{folder}/diff_input_result.json",
+            f"{case_name}/diff_input_result.json",
             data=io.BytesIO(data_bytes),
             length=len(data_bytes),
             content_type="application/json"
         )
-            
-        # result = 0.5
-        logger.info(f"Model inference result: {result}")
-
-        return JSONResponse(content={"response": result})
+        logger.info(f"Score sent to minio")
     except Exception as e:
         logger.error(f"Exception in /diff-model/: {e}")
-        return JSONResponse(status_code=500, content={"error": str(e)})
+
