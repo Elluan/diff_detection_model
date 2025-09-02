@@ -11,4 +11,5 @@ app.conf.broker_url = os.environ.get("BROKER_URL", "amqp://admin:password@rabbit
 #     "CELERY_RESULT_BACKEND",
 #     "redis://redis:6379/0"
 # )
+app.conf.result_backend = None
 app.autodiscover_tasks(['dual_input'])
