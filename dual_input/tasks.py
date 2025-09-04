@@ -74,7 +74,7 @@ def get_dual_input_prediction(bucket_name, case_name):
 
         minio_client.put_object(
             bucket_name,
-            f"{case_name}/diff_input_result.json",
+            f"{case_name}/result.json",
             data=io.BytesIO(data_bytes),
             length=len(data_bytes),
             content_type="application/json"
