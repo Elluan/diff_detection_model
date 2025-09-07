@@ -10,3 +10,4 @@ minio==7.2.15
 sqlalchemy
 psycopg2-binary
 redis>=5.0
+python-dotenv

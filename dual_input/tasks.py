@@ -10,6 +10,7 @@ import json
 import io
 import sys
 import os
+from dotenv import load_dotenv
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from load_model_for_interactive import load_model_for_interactive
@@ -22,12 +23,16 @@ model = load_model_for_interactive()
 logger.info(f"Model loaded: {model}")
 
 
+load_dotenv(dotenv_path="../../backend/secrets.env")
+load_dotenv(dotenv_path="../../backend/global.env")
+
 minio_client = Minio(
-    "minio:9000",
-    access_key="1GuTxVoX2I5R9qwxC8Aq",
-    secret_key="00eXWYBYKkmdkYQ4UnwnSyMZlzTDFvScCvtlSQ8Z",
+    f"{os.environ['MINIO_HOSTNAME']}:9000",
+    access_key=os.environ['DJANGO_MINIO_KEY'],
+    secret_key=os.environ['DJANGO_MINIO_SECRET'],
     secure=False
 )
+
 
 def get_audio_files(bucket_name, case_name, folder):
     objects = minio_client.list_objects(bucket_name, prefix=f"{case_name}/{folder}/", recursive=True)
@@ -46,6 +51,11 @@ def get_dual_input_prediction(bucket_name, case_name):
         logger.info("Starting dual input prediction")
         questioned_files = get_audio_files(bucket_name, case_name, "questioned")
         ref_files = get_audio_files(bucket_name, case_name, "ref")
+
+        if not questioned_files:
+            raise ValueError(f"No questioned audio files found in {case_name}/questioned/")
+        if not ref_files:
+            raise ValueError(f"No reference audio files found in {case_name}/ref/")
 
         _, questioned_bytes = questioned_files[0]
         _, ref_bytes = ref_files[0]
