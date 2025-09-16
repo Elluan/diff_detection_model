@@ -14,7 +14,7 @@ Docker for this modele : https://github.com/vojteskas/Differential-Detection/tre
  - FFConcat3_MHFA_finetune_7.pt model avaiable here :  https://drive.google.com/file/d/1FM-WowOpWLpgTFIzPFjpu_6amcMhctp0/view?usp=drive_link
 
 ## Usage
-First, you need to place the FFConcat3 model into the main diff_detection_model folder.
+First, you need to place the FFConcat3 model into the root of this folder.
 
 To run this model it is necessary to have these repositories:
 - backend : clone the repo and switch to the naboso branch
