@@ -1,6 +1,4 @@
 from torchaudio import load
-from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import JSONResponse
 from pathlib import Path
 import shutil
 import logging
@@ -34,8 +32,8 @@ minio_client = Minio(
 )
 
 
-def get_audio_files(bucket_name, case_name, folder):
-    objects = minio_client.list_objects(bucket_name, prefix=f"{case_name}/{folder}/", recursive=True)
+def get_audio_files(bucket_name, folder, type):
+    objects = minio_client.list_objects(bucket_name, prefix=f"{folder}/{type}/", recursive=True)
     files = []
     for obj in objects:
         if obj.object_name.endswith(".mp3"):
@@ -46,16 +44,16 @@ def get_audio_files(bucket_name, case_name, folder):
     return files
 
 @shared_task()
-def get_dual_input_prediction(bucket_name, case_name):
+def get_dual_input_prediction(bucket_name, folder):
     try:
         logger.info("Starting dual input prediction")
-        questioned_files = get_audio_files(bucket_name, case_name, "questioned")
-        ref_files = get_audio_files(bucket_name, case_name, "ref")
+        questioned_files = get_audio_files(bucket_name, folder, "questioned")
+        ref_files = get_audio_files(bucket_name, folder, "ref")
 
         if not questioned_files:
-            raise ValueError(f"No questioned audio files found in {case_name}/questioned/")
+            raise ValueError(f"No questioned audio files found in {folder}/questioned/")
         if not ref_files:
-            raise ValueError(f"No reference audio files found in {case_name}/ref/")
+            raise ValueError(f"No reference audio files found in {folder}/ref/")
 
         _, questioned_bytes = questioned_files[0]
         _, ref_bytes = ref_files[0]
@@ -84,7 +82,7 @@ def get_dual_input_prediction(bucket_name, case_name):
 
         minio_client.put_object(
             bucket_name,
-            f"{case_name}/result.json",
+            f"{folder}/result.json",
             data=io.BytesIO(data_bytes),
             length=len(data_bytes),
             content_type="application/json"
